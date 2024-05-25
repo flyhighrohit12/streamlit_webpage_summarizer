@@ -1,8 +1,6 @@
 streamlit
-newspaper3k
 beautifulsoup4
 requests
 nltk
 transformers
 torch
-lxml

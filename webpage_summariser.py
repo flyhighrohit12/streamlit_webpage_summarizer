@@ -1,5 +1,4 @@
 import streamlit as st
-from newspaper import Article
 from bs4 import BeautifulSoup
 import requests
 from transformers import pipeline
@@ -8,25 +7,16 @@ import nltk
 # Download the punkt tokenizer
 nltk.download('punkt')
 
-# Function to get the article text using Newspaper3k
-def get_article_text_newspaper(url):
-    try:
-        article = Article(url)
-        article.download()
-        article.parse()
-        return article.text
-    except:
-        return None
-
 # Function to get the article text using BeautifulSoup
-def get_article_text_bs4(url):
+def get_article_text(url):
     try:
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         paragraphs = soup.find_all('p')
         article_text = " ".join([para.get_text() for para in paragraphs])
         return article_text
-    except:
+    except Exception as e:
+        st.error(f"An error occurred while fetching the article text: {e}")
         return None
 
 # Function to summarize text using a transformer model
@@ -44,12 +34,8 @@ url = st.text_input("Enter the URL of the webpage you want to summarize")
 
 if url:
     try:
-        # Try to get the article text using Newspaper3k
-        article_text = get_article_text_newspaper(url)
-        
-        # If Newspaper3k fails, use BeautifulSoup
-        if not article_text:
-            article_text = get_article_text_bs4(url)
+        # Get article text
+        article_text = get_article_text(url)
         
         # If we have the article text, summarize it
         if article_text:
